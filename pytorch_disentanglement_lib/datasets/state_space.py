@@ -69,3 +69,36 @@ class StateSpace(object):
 
     def _sample_factor(self, i: int, num: int, random_state: np.random.RandomState):
         return random_state.randint(self.factor_sizes[i], size=num)
+
+
+class RestrictedStateSpace(StateSpace):
+    """
+    This state space applies following intervention to the latent factors
+    - Set range restrictions to the latent factors
+    """
+    def __init__(self, factor_sizes: Sequence[int], latent_factor_indices: Sequence[int], factors_range: dict):
+        super().__init__(factor_sizes, latent_factor_indices)
+        self.factors_range = factors_range
+
+    def sample_latent_factors(self, num: int, random_state: np.random.RandomState):
+        """
+        Sample a batch of the latent factors
+        """
+        factors = np.zeros(shape=(num, len(self.latent_factor_indices)), dtype=np.int64)
+        range_restriction_keys = self.factors_range.keys()
+        for pos, i in enumerate(self.latent_factor_indices):
+            if i not in range_restriction_keys:
+                factors[:, pos] = self._sample_factor(i, num, random_state)
+            else:
+                if isinstance(self.factors_range[i], tuple):
+                    factor_range = self.factors_range[i]
+                    range_obj = list(range(factor_range[0], factor_range[1], 1))
+                elif isinstance(self.factors_range[i], list):
+                    range_obj = self.factors_range[i]
+                else:
+                    raise NotImplementedError
+                factors[:, pos] = self._sample_factor_from_range(num, random_state, range_obj)
+        return factors
+
+    def _sample_factor_from_range(self, num: int, random_state: np.random.RandomState, range_obj: list):
+        return random_state.choice(range_obj, size=num)
