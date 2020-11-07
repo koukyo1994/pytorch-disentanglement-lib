@@ -30,7 +30,6 @@ from pathlib import Path
 from typing import Union
 
 from pytorch_disentanglement_lib.datasets.base import DatasetBase
-from pytorch_disentanglement_lib.datasets.state_space import StateSpace
 
 
 class MPI3D(DatasetBase):
@@ -57,7 +56,7 @@ class MPI3D(DatasetBase):
     6 - Second DOF (40 different values)
     """
 
-    def __init__(self, state_space: StateSpace, dataset_path: Union[str, Path], mode="mpi3d_toy"):
+    def __init__(self, state_space, dataset_path: Union[str, Path], mode="mpi3d_toy"):
         data = np.load(dataset_path)
         if mode in ["mpi3d_toy", "mpi3d_realistic"]:
             self.factor_sizes = [4, 4, 2, 3, 3, 40, 40]
@@ -69,7 +68,7 @@ class MPI3D(DatasetBase):
         self.images = data["images"]
         self.latent_factor_indices = [0, 1, 2, 3, 4, 5, 6]
         self.num_total_factors = 7
-        self.state_space = state_space
+        self.state_space = state_space(factor_sizes=self.factor_sizes, latent_factor_indices=self.latent_factor_indices)
         self.factor_bases = np.prod(self.factor_sizes) / np.cumprod(self.factor_sizes)
 
     @property

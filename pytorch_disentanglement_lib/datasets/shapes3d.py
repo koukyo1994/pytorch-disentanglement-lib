@@ -31,7 +31,6 @@ from pathlib import Path
 from typing import Union
 
 from pytorch_disentanglement_lib.datasets.base import DatasetBase
-from pytorch_disentanglement_lib.datasets.state_space import StateSpace
 
 
 class Shapes3D(DatasetBase):
@@ -51,7 +50,7 @@ class Shapes3D(DatasetBase):
     4 - object type (4 different values)
     5 - azimuth (15 different values)
     """
-    def __init__(self, state_space: StateSpace, dataset_path: Union[str, Path], data_format="h5"):
+    def __init__(self, state_space, dataset_path: Union[str, Path], data_format="h5"):
         assert data_format in {"h5", "npy", "npz"}, \
             "data_format must be one of 'h5', 'npy' and 'npz"
 
@@ -76,7 +75,7 @@ class Shapes3D(DatasetBase):
         self.factor_sizes = [10, 10, 10, 8, 4, 15]
         self.latent_factor_indices = list(range(6))
         self.num_total_factors = labels.shape[1]
-        self.state_space = state_space
+        self.state_space = state_space(factor_sizes=self.factor_sizes, latent_factor_indices=self.latent_factor_indices)
         self.factor_bases = np.prod(self.factor_sizes) / np.cumprod(self.factor_sizes)
 
     @property

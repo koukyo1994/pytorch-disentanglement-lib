@@ -26,7 +26,19 @@ from __future__ import print_function
 
 import numpy as np
 
+from functools import partial
 from typing import Sequence
+
+
+def configure_state_space(name: str, factors_range=None):
+    if name == "normal":
+        return StateSpace
+    elif name == "restricted" and factors_range is not None:
+        return partial(RestrictedStateSpace, factors_range=factors_range)
+    elif name == "restricted" and factors_range is not None:
+        return partial(RestrictedStateSpace, factors_range={})
+    else:
+        raise NotImplementedError("Unknown name provided, 'name' should be either 'normal' or 'restricted'")
 
 
 class StateSpace(object):

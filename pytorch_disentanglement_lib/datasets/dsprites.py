@@ -31,7 +31,6 @@ from PIL import Image
 from typing import Union
 
 from pytorch_disentanglement_lib.datasets.base import DatasetBase
-from pytorch_disentanglement_lib.datasets.state_space import StateSpace
 
 
 class DSprites(DatasetBase):
@@ -49,7 +48,7 @@ class DSprites(DatasetBase):
     4 - position y (32 different values)
     """
 
-    def __init__(self, state_space: StateSpace, dataset_path: Union[str, Path], latent_factor_indices=None):
+    def __init__(self, state_space, dataset_path: Union[str, Path], latent_factor_indices=None):
         # By default, all factors (including shape) are considered  as ground truth factors
         if latent_factor_indices is None:
             latent_factor_indices = list(range(6))
@@ -62,7 +61,7 @@ class DSprites(DatasetBase):
         self.factor_sizes = data["metadata"][()]["latents_sizes"][1:]
         self.full_factor_sizes = [3, 6, 40, 32, 32]
         self.factor_bases = np.prod(self.factor_sizes) / np.cumprod(self.factor_sizes)
-        self.state_space = state_space
+        self.state_space = state_space(factor_sizes=self.factor_sizes, latent_factor_indices=self.latent_factor_indices)
 
     @property
     def num_factors(self):
@@ -101,7 +100,7 @@ class ColorDSprites(DSprites):
     4 - position y (32 different values)
     """
 
-    def __init__(self, state_space: StateSpace, dataset_path: Union[str, Path], latent_factor_indices=None):
+    def __init__(self, state_space, dataset_path: Union[str, Path], latent_factor_indices=None):
         super().__init__(state_space, dataset_path, latent_factor_indices)
         self.data_shape = [64, 64, 3]
 
@@ -132,7 +131,7 @@ class NoisyDSprites(DSprites):
     3 - position x (32 different values)
     4 - position y (32 different values)
     """
-    def __init__(self, state_space: StateSpace, dataset_path: Union[str, Path], latent_factor_indices=None):
+    def __init__(self, state_space, dataset_path: Union[str, Path], latent_factor_indices=None):
         super().__init__(state_space, dataset_path, latent_factor_indices)
         self.data_shape = [64, 64, 3]
 
@@ -158,7 +157,7 @@ class ScreamDSprites(DSprites):
     4 - position y (32 different values)
     """
 
-    def __init__(self, state_space: StateSpace, dataset_path: Union[str, Path], scream_path: Union[str, Path], latent_factor_indices=None):
+    def __init__(self, state_space, dataset_path: Union[str, Path], scream_path: Union[str, Path], latent_factor_indices=None):
         super().__init__(state_space, dataset_path, latent_factor_indices)
         self.data_shape = [64, 64, 3]
 
